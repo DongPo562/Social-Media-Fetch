@@ -4,6 +4,7 @@ const path = require('path');
 const ini = require('ini');
 const XLSX = require('xlsx');
 const axios = require('axios');
+const { exec } = require('child_process');
 
 // Load Config
 const configPath = path.join(__dirname, 'config.ini');
@@ -16,6 +17,7 @@ try {
 
 const DOWNLOAD_CONFIG = config.Download || {};
 const ADVANCED_CONFIG = config.Advanced || {};
+const AUDIO_CONFIG = config.Audio || {};
 
 const ENABLE_DOWNLOAD = DOWNLOAD_CONFIG.enable_download !== false;
 const ARTICLES_FOLDER = path.resolve(__dirname, DOWNLOAD_CONFIG.articles_folder || 'articles');
@@ -25,6 +27,10 @@ const DOWNLOAD_TIMEOUT = parseInt(DOWNLOAD_CONFIG.download_timeout || 600000);
 const PAGE_LOAD_TIMEOUT = parseInt(DOWNLOAD_CONFIG.page_load_timeout || 30000);
 const RETRY_TIMES = parseInt(DOWNLOAD_CONFIG.retry_times || 1);
 const RETRY_FAILED = DOWNLOAD_CONFIG.retry_failed === true || DOWNLOAD_CONFIG.retry_failed === 'true';
+
+const ENABLE_AUDIO_EXTRACT = AUDIO_CONFIG.enable_audio_extract === true || AUDIO_CONFIG.enable_audio_extract === 'true';
+const AUDIO_BITRATE = parseInt(AUDIO_CONFIG.audio_bitrate || 192);
+const KEEP_ORIGINAL_VIDEO = AUDIO_CONFIG.keep_original_video !== false;
 
 const EXCEL_PATH = path.resolve(__dirname, config.TouTiao?.excel_path || 'favorite.xlsx');
 const ENABLE_LOG = ADVANCED_CONFIG.enable_log !== false;
@@ -75,7 +81,7 @@ function updateExcelStatus(id, status, localPath, errorMsg = '') {
         data[index]['本地地址'] = localPath || errorMsg;
         
         const newSheet = XLSX.utils.json_to_sheet(data, { 
-            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址'] 
+            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
         });
         workbook.Sheets[sheetName] = newSheet;
         XLSX.writeFile(workbook, EXCEL_PATH);
@@ -163,109 +169,22 @@ async function downloadArticle(page, item) {
     return path.relative(__dirname, filePath);
 }
 
-async function downloadVideo(page, item) {
-    log(`[视频] 正在处理: ${item['标题']}`);
-
-    // Create directory
-    const dateStr = item['保存日期'] || new Date().toISOString().split('T')[0];
-    const targetDir = path.join(VIDEOS_FOLDER, dateStr);
-    ensureDir(targetDir);
-    const fileName = `${item['编号']}.mp4`;
-    const filePath = path.join(targetDir, fileName);
-
-    // Setup network interception for video url
-    let videoUrl = null;
-    const client = await page.target().createCDPSession();
-    await client.send('Network.enable');
-    
-    // Listener for media
-    const responseHandler = (event) => {
-        if (videoUrl) return;
-        const resp = event.response;
-        if (resp.mimeType && (resp.mimeType.includes('video/mp4') || resp.mimeType.includes('video/webm'))) {
-            // Filter out small segments if possible, but for now take first valid video
-            // Toutiao often serves blob: or direct mp4
-            if (resp.url.startsWith('http')) {
-                videoUrl = resp.url;
-            }
-        }
-    };
-    client.on('Network.responseReceived', responseHandler);
-
-    // Open Page
+// Helper for downloading streams
+async function downloadStream(url, filePath, maxSizeMB = 0) {
     try {
-        await page.goto(item['链接'], { waitUntil: 'domcontentloaded', timeout: PAGE_LOAD_TIMEOUT });
-    } catch (e) {
-        throw new Error(`页面加载失败: ${e.message}`);
-    }
-
-    // Wait for video element
-    try {
-        await page.waitForSelector('video', { timeout: 15000 });
-    } catch (e) {
-        log("警告: 未找到video标签，等待网络请求捕获...");
-    }
-
-    // Give some time for media requests
-    await new Promise(r => setTimeout(r, 5000));
-
-    // Try to get src from video tag if network intercept didn't work
-    if (!videoUrl) {
-        videoUrl = await page.evaluate(() => {
-            const v = document.querySelector('video');
-            if (v) return v.src;
-            return null;
-        });
-    }
-    
-    // Try to find in page source (window.__INITIAL_STATE__ etc) - Fallback
-    if (!videoUrl || videoUrl.startsWith('blob:')) {
-        // Blob URLs cannot be downloaded directly by nodejs easily without context
-        // Try to find the real source in scripts
-        const scriptUrl = await page.evaluate(() => {
-            const scripts = document.querySelectorAll('script');
-            for (const s of scripts) {
-                const c = s.innerText;
-                if (c.includes('video_url')) {
-                    // Simple regex extract attempt (very rough)
-                    const match = c.match(/"video_url"\s*:\s*"([^"]+)"/);
-                    if (match) return JSON.parse(`"${match[1]}"`); // unescape
-                }
-            }
-            return null;
-        });
-        if (scriptUrl) videoUrl = window.atob(scriptUrl); // Sometimes base64? No, usually just escaped.
-        // Actually specialized parsers are better, but let's stick to what we found or just fail if blob
-        if (scriptUrl) videoUrl = scriptUrl;
-    }
-
-    if (!videoUrl || videoUrl.startsWith('blob:')) {
-        // If we still have a blob url, we might need to use puppeteer to fetch it as blob and convert to buffer
-        // But for now, let's error if we can't get a http url
-        throw new Error("无法获取有效的视频下载地址 (可能是Blob加密流)");
-    }
-
-    log(`找到视频地址: ${videoUrl.substring(0, 50)}...`);
-
-    // Check size
-    try {
-        const head = await axios.head(videoUrl);
+        const head = await axios.head(url);
         const size = parseInt(head.headers['content-length'] || 0);
         const sizeMB = size / (1024 * 1024);
-        if (sizeMB > MAX_VIDEO_SIZE_MB) {
-            throw new Error(`视频大小 (${sizeMB.toFixed(2)}MB) 超过限制 (${MAX_VIDEO_SIZE_MB}MB)`);
+        if (maxSizeMB > 0 && sizeMB > maxSizeMB) {
+            throw new Error(`资源大小 (${sizeMB.toFixed(2)}MB) 超过限制 (${maxSizeMB}MB)`);
         }
-        log(`视频大小: ${sizeMB.toFixed(2)} MB`);
     } catch (e) {
-        log(`无法获取视频大小，直接尝试下载... (${e.message})`);
+        if (e.message.includes('超过限制')) throw e;
     }
 
-    // Download
-    log("开始下载视频流...");
     const writer = fs.createWriteStream(filePath);
-    
     const response = await axios({
-        url: videoUrl,
+        url: url,
         method: 'GET',
         responseType: 'stream',
         timeout: DOWNLOAD_TIMEOUT
@@ -274,15 +193,336 @@ async function downloadVideo(page, item) {
     response.data.pipe(writer);
 
     return new Promise((resolve, reject) => {
-        writer.on('finish', () => {
-            log(`✓ 视频已保存: ${filePath}`);
-            resolve(path.relative(__dirname, filePath));
-        });
+        writer.on('finish', resolve);
         writer.on('error', (err) => {
-            fs.unlink(filePath, () => {}); // Delete partial file
-            reject(new Error(`写入文件失败: ${err.message}`));
+            fs.unlink(filePath, () => {});
+            reject(new Error(`下载流失败: ${err.message}`));
         });
     });
+}
+
+// Helper for merging video and audio
+function mergeStreams(videoPath, audioPath, outputPath) {
+    return new Promise((resolve, reject) => {
+        // -c:v copy -c:a copy is fastest and lossless
+        const cmd = `ffmpeg -i "${videoPath}" -i "${audioPath}" -c:v copy -c:a copy "${outputPath}" -y`;
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                reject(new Error(`FFmpeg合并失败: ${error.message}`));
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+// Helper to check file streams using ffmpeg
+function checkFileStreams(filePath) {
+    return new Promise((resolve) => {
+        const cmd = `ffmpeg -i "${filePath}"`;
+        exec(cmd, (error, stdout, stderr) => {
+            // FFmpeg output is usually in stderr
+            const output = stderr || stdout || '';
+            const hasVideo = output.includes('Video:');
+            const hasAudio = output.includes('Audio:');
+            resolve({ hasVideo, hasAudio });
+        });
+    });
+}
+
+async function downloadVideo(page, item) {
+    log(`[视频] 正在处理: ${item['标题']}`);
+
+    const dateStr = item['保存日期'] || new Date().toISOString().split('T')[0];
+    const targetDir = path.join(VIDEOS_FOLDER, dateStr);
+    ensureDir(targetDir);
+    const fileName = `${item['编号']}.mp4`;
+    const filePath = path.join(targetDir, fileName);
+
+    // Candidates
+    const candidates = [];
+    
+    const client = await page.target().createCDPSession();
+    await client.send('Network.enable');
+    
+    const responseHandler = (event) => {
+        const resp = event.response;
+        if (!resp.mimeType) return;
+        
+        if (resp.url.startsWith('http')) {
+            const isVideo = resp.mimeType.includes('video/');
+            const isAudio = resp.mimeType.includes('audio/');
+            
+            if (isVideo || isAudio) {
+                candidates.push({
+                    url: resp.url,
+                    mime: resp.mimeType,
+                    type: isVideo ? 'video' : 'audio',
+                    length: parseInt(resp.headers['content-length'] || 0)
+                });
+            }
+        }
+    };
+    client.on('Network.responseReceived', responseHandler);
+
+    try {
+        await page.goto(item['链接'], { waitUntil: 'domcontentloaded', timeout: PAGE_LOAD_TIMEOUT });
+    } catch (e) {
+        throw new Error(`页面加载失败: ${e.message}`);
+    }
+
+    try {
+        await page.waitForSelector('video', { timeout: 15000 });
+    } catch (e) {
+        log("警告: 未找到video标签，等待网络请求捕获...");
+    }
+
+    // Wait longer for requests to be captured (10s as requested)
+    log("等待媒体流捕获 (10秒)...");
+    await new Promise(r => setTimeout(r, 10000));
+
+    // Remove duplicates
+    const uniqueCandidates = [];
+    const seenUrls = new Set();
+    for (const cand of candidates) {
+        if (!seenUrls.has(cand.url)) {
+            seenUrls.add(cand.url);
+            uniqueCandidates.push(cand);
+        }
+    }
+
+    // Analyze candidates
+    log(`捕获到 ${uniqueCandidates.length} 个媒体流请求`);
+    let videoUrl = null;
+    let audioUrl = null;
+    let maxVideoSize = -1;
+
+    for (const cand of uniqueCandidates) {
+        log(`  - [${cand.type}] ${cand.mime} Size:${cand.length} URL:${cand.url.substring(0, 50)}...`);
+        
+        if (cand.type === 'video') {
+            // Heuristic: Audio streams sometimes are labeled as video/mp4 but have "audio" in URL
+            // Or just multiple video streams, pick largest if length known, otherwise update
+            // For now, if we already have a videoUrl, only replace if this one looks "better" (e.g. larger)
+            // But often length is 0 for chunks.
+            
+            // Simple logic: If URL contains 'audio' and we have another option, skip it
+            if (cand.url.includes('audio') && !cand.url.includes('video')) {
+                 // Likely audio disguised as video mime
+                 if (!audioUrl) audioUrl = cand.url;
+                 continue;
+            }
+
+            // If we don't have a video url yet, take it
+            if (!videoUrl) {
+                videoUrl = cand.url;
+                maxVideoSize = cand.length;
+            } else {
+                // If we have one, update if this one is larger (and strictly larger than 0)
+                if (cand.length > maxVideoSize) {
+                    videoUrl = cand.url;
+                    maxVideoSize = cand.length;
+                }
+            }
+        } else if (cand.type === 'audio') {
+            if (!audioUrl) audioUrl = cand.url;
+        }
+    }
+
+    // Fallback: If no videoUrl found from network, try DOM
+    if (!videoUrl) {
+        log("未从网络捕获到视频流，尝试从DOM获取...");
+        videoUrl = await page.evaluate(() => {
+            const v = document.querySelector('video');
+            return v ? v.src : null;
+        });
+        if (videoUrl && !videoUrl.startsWith('http')) videoUrl = null;
+    }
+    
+    // Fallback: Scripts
+    if (!videoUrl) {
+        const scriptUrl = await page.evaluate(() => {
+            const scripts = document.querySelectorAll('script');
+            for (const s of scripts) {
+                const c = s.innerText;
+                if (c.includes('video_url')) {
+                    const match = c.match(/"video_url"\s*:\s*"([^"]+)"/);
+                    if (match) return JSON.parse(`"${match[1]}"`);
+                }
+            }
+            return null;
+        });
+        if (scriptUrl) videoUrl = scriptUrl;
+    }
+
+    if (!videoUrl || videoUrl.startsWith('blob:')) {
+        throw new Error("无法获取有效的视频下载地址");
+    }
+
+    // --- Logic for Downloading and Merging ---
+
+    const tempVideo = path.join(targetDir, `${item['编号']}_v_temp.mp4`);
+    const tempAudio = path.join(targetDir, `${item['编号']}_a_temp.mp4`);
+    let downloadedVideoPath = null;
+    let downloadedAudioPath = null;
+
+    // 1. Download "Video"
+    log(`下载主视频流: ${videoUrl.substring(0, 50)}...`);
+    await downloadStream(videoUrl, tempVideo, MAX_VIDEO_SIZE_MB);
+    
+    // Verify what we downloaded
+    let videoCheck = await checkFileStreams(tempVideo);
+    log(`主文件流检查: Video=${videoCheck.hasVideo}, Audio=${videoCheck.hasAudio}`);
+
+    if (videoCheck.hasVideo) {
+        downloadedVideoPath = tempVideo;
+    } else {
+        log("警告: 下载的'视频'文件实际上不包含视频画面 (可能是音频)!");
+        if (!audioUrl && videoCheck.hasAudio) {
+            log("  -> 将其作为音频源使用");
+            // Rename or just use as audio source
+            if (fs.existsSync(tempAudio)) fs.unlinkSync(tempAudio);
+            fs.renameSync(tempVideo, tempAudio);
+            downloadedAudioPath = tempAudio;
+            downloadedVideoPath = null;
+            videoUrl = null; // We lost our video source
+        } else {
+            // Garbage or duplicate audio
+            fs.unlink(tempVideo, () => {});
+            downloadedVideoPath = null;
+        }
+    }
+
+    // 1.1 If we have video but no audio, check other candidates
+    if (downloadedVideoPath && !videoCheck.hasAudio && !audioUrl) {
+        log("主视频没有声音，尝试从其他候选流中寻找音频...");
+        const otherCandidates = uniqueCandidates.filter(c => c.url !== videoUrl);
+        
+        for (const cand of otherCandidates) {
+            log(`  检查候选流: ${cand.url.substring(0, 50)}...`);
+            const tempCand = path.join(targetDir, `${item['编号']}_cand_${Date.now()}.mp4`);
+            try {
+                // Download a bit or full? Full is safer for now
+                await downloadStream(cand.url, tempCand, MAX_VIDEO_SIZE_MB);
+                const candCheck = await checkFileStreams(tempCand);
+                log(`  候选流检查: Video=${candCheck.hasVideo}, Audio=${candCheck.hasAudio}`);
+                
+                if (candCheck.hasAudio) {
+                    log("  -> 找到音频流！");
+                    if (fs.existsSync(tempAudio)) fs.unlinkSync(tempAudio);
+                    fs.renameSync(tempCand, tempAudio);
+                    downloadedAudioPath = tempAudio;
+                    audioUrl = cand.url; // Mark as found
+                    break;
+                } else {
+                    fs.unlink(tempCand, () => {});
+                }
+            } catch (e) {
+                log(`  候选流下载/检查失败: ${e.message}`);
+                if (fs.existsSync(tempCand)) fs.unlink(tempCand, () => {});
+            }
+        }
+    }
+
+    // 2. Download Audio if needed (and not already found in step 1.1)
+    if (audioUrl) {
+        log(`下载音频流: ${audioUrl.substring(0, 50)}...`);
+        try {
+            await downloadStream(audioUrl, tempAudio);
+            downloadedAudioPath = tempAudio;
+        } catch (e) {
+            log(`音频下载失败: ${e.message}`);
+        }
+    }
+
+    // 3. Recovery: If we lost video but have candidates, maybe try another one?
+    // (For simplicity, skipping complex retry logic here, but notifying user)
+    if (!downloadedVideoPath) {
+        throw new Error("未能下载到有效的视频文件 (只有音频或文件无效)");
+    }
+
+    // 4. Merge or Rename
+    if (downloadedVideoPath && downloadedAudioPath) {
+        log("检测到独立的视频和音频文件，开始合并...");
+        try {
+            await mergeStreams(downloadedVideoPath, downloadedAudioPath, filePath);
+            log(`✓ 视频(合并版)已保存: ${filePath}`);
+            fs.unlink(downloadedVideoPath, () => {});
+            fs.unlink(downloadedAudioPath, () => {});
+        } catch (e) {
+            log(`合并失败: ${e.message}, 保留主视频文件`);
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            fs.renameSync(downloadedVideoPath, filePath);
+            if (fs.existsSync(downloadedAudioPath)) fs.unlinkSync(downloadedAudioPath);
+        }
+    } else if (downloadedVideoPath) {
+        if (!videoCheck.hasAudio) {
+            log("警告: 视频文件没有声音，且未找到独立音频流。");
+        }
+        log("仅有视频文件，直接保存...");
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        fs.renameSync(downloadedVideoPath, filePath);
+        log(`✓ 视频已保存: ${filePath}`);
+    }
+
+    return path.relative(__dirname, filePath);
+}
+
+function extractAudio(videoPath, item) {
+    return new Promise((resolve, reject) => {
+        const fullVideoPath = path.resolve(__dirname, videoPath);
+        if (!fs.existsSync(fullVideoPath)) {
+            return reject(new Error("Video file not found"));
+        }
+
+        const audioPath = fullVideoPath.replace(/\.[^.]+$/, '.mp3');
+        // Use ffmpeg to extract audio
+        // -vn: no video
+        // -ar 44100: audio rate
+        // -ac 2: audio channels
+        // -b:a: bitrate
+        // -y: overwrite
+        const cmd = `ffmpeg -i "${fullVideoPath}" -vn -ar 44100 -ac 2 -b:a ${AUDIO_BITRATE}k -f mp3 "${audioPath}" -y`;
+
+        log(`[音频] 开始提取: ${path.basename(audioPath)}`);
+        exec(cmd, (error, stdout, stderr) => {
+            if (error) {
+                log(`[音频] 提取失败: ${error.message}`);
+                return reject(error);
+            }
+            log(`✓ [音频] 提取成功: ${audioPath}`);
+            
+            if (!KEEP_ORIGINAL_VIDEO) {
+                fs.unlink(fullVideoPath, (err) => {
+                    if (err) log(`警告: 删除原视频失败: ${err.message}`);
+                    else log(`原视频已删除`);
+                });
+            }
+            resolve(path.relative(__dirname, audioPath));
+        });
+    });
+}
+
+function updateExcelAudioStatus(id, status) {
+    try {
+        const workbook = XLSX.readFile(EXCEL_PATH);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(sheet);
+
+        const index = data.findIndex(r => r['编号'] == id);
+        if (index !== -1) {
+            data[index]['音频状态'] = status;
+            
+            const newSheet = XLSX.utils.json_to_sheet(data, { 
+                header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
+            });
+            workbook.Sheets[sheetName] = newSheet;
+            XLSX.writeFile(workbook, EXCEL_PATH);
+        }
+    } catch (e) {
+        errorLog("更新音频状态失败", e);
+    }
 }
 
 (async () => {
@@ -359,6 +599,17 @@ async function downloadVideo(page, item) {
                 updateExcelStatus(item['编号'], 1, localPath);
                 success = true;
                 successCount++;
+
+                // Audio Extraction
+                if (item['媒体类型'] === '视频' && ENABLE_AUDIO_EXTRACT) {
+                    try {
+                        await extractAudio(localPath, item);
+                        updateExcelAudioStatus(item['编号'], '已提取');
+                    } catch (ae) {
+                        log(`  音频提取失败: ${ae.message}`);
+                        updateExcelAudioStatus(item['编号'], '提取失败');
+                    }
+                }
 
             } catch (e) {
                 errorMsg = e.message;

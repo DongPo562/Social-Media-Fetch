@@ -40,4 +40,7 @@ Thumbs.db
 .pnp.js
 .pnpm-store/
 
-*.txt
+# Custom ignores
+fetch_log.txt
+error_log.txt
+

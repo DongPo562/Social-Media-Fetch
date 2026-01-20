@@ -147,13 +147,14 @@ function saveExcelData(newData) {
             '链接': item.link,
             '保存日期': new Date().toISOString().split('T')[0],
             '是否下载': 0, // New items default to not downloaded
-            '本地地址': ''
+            '本地地址': '',
+            '音频状态': ''
         }));
 
         const allData = existingData.concat(finalData);
         // Ensure correct column order
         const sheetWithHeader = XLSX.utils.json_to_sheet(allData, { 
-            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址'] 
+            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
         });
 
         if (workbook.SheetNames.length === 0) {

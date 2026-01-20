@@ -74,3 +74,519 @@
 [2026-01-20T05:50:48.214Z] 成功: 1
 [2026-01-20T05:50:48.214Z] 失败: 2
 [2026-01-20T05:50:48.215Z] =========================================
+[2026-01-20T07:45:52.566Z] =========================================
+[2026-01-20T07:45:52.567Z] 今日头条收藏内容下载工具
+[2026-01-20T07:45:52.568Z] =========================================
+[2026-01-20T07:45:52.596Z] 待处理任务: 1 条
+[2026-01-20T07:45:52.597Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T07:45:52.598Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T07:45:53.766Z] 
+[1/1] 开始处理 编号:1 类型:视频
+[2026-01-20T07:45:53.768Z] [视频] 正在处理: “一周干完一年活”！Claude Code让工程师集体“上瘾”：写代码、操控电脑、整理文件夹，背后却埋安全暗雷
+[2026-01-20T07:46:11.429Z] 警告: 未找到video标签，等待网络请求捕获...
+[2026-01-20T07:46:16.438Z]   ✗ 失败: 无法获取有效的视频下载地址 (可能是Blob加密流)
+[2026-01-20T07:46:21.442Z]   正在重试 (1/1)...
+[2026-01-20T07:46:21.444Z] [视频] 正在处理: “一周干完一年活”！Claude Code让工程师集体“上瘾”：写代码、操控电脑、整理文件夹，背后却埋安全暗雷
+[2026-01-20T07:46:38.207Z] 警告: 未找到video标签，等待网络请求捕获...
+[2026-01-20T07:46:43.219Z]   ✗ 失败: 无法获取有效的视频下载地址 (可能是Blob加密流)
+[2026-01-20T07:46:43.248Z] 
+=========================================
+[2026-01-20T07:46:43.250Z] 下载任务完成
+[2026-01-20T07:46:43.250Z] 成功: 0
+[2026-01-20T07:46:43.251Z] 失败: 1
+[2026-01-20T07:46:43.251Z] =========================================
+[2026-01-20T07:49:37.375Z] =========================================
+[2026-01-20T07:49:37.376Z] 今日头条收藏内容下载工具
+[2026-01-20T07:49:37.377Z] =========================================
+[2026-01-20T07:49:37.402Z] 待处理任务: 4 条
+[2026-01-20T07:49:37.403Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T07:49:37.404Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T07:49:38.033Z] 
+[1/4] 开始处理 编号:12 类型:文章
+[2026-01-20T07:49:38.034Z] [文章] 正在处理: 用第一性原理拆解 Agentic Coding：从理论到实操
+[2026-01-20T07:49:41.553Z] ✓ 文章已保存: D:\Auto Workbench\puppeteer\articles\2026-01-20\12.txt
+[2026-01-20T07:49:41.582Z] 
+[2/4] 开始处理 编号:13 类型:视频
+[2026-01-20T07:49:41.584Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T07:49:47.778Z] 找到视频地址: https://v26-web.toutiaovod.com/b975f8aee478aa8a04b...
+[2026-01-20T07:49:48.133Z] 视频大小: 42.07 MB
+[2026-01-20T07:49:48.134Z] 开始下载视频流...
+[2026-01-20T07:49:54.961Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T07:49:54.994Z] [音频] 开始提取: 13.mp3
+[2026-01-20T07:49:54.995Z]   音频提取失败: exec is not defined
+[2026-01-20T07:49:55.018Z] 
+[3/4] 开始处理 编号:14 类型:视频
+[2026-01-20T07:49:55.018Z] [视频] 正在处理: OpenCode 实测｜从零开发一个 AI 应用 OpenC
+[2026-01-20T07:50:00.896Z] 找到视频地址: https://v26-web.toutiaovod.com/128d77fc85892e1158b...
+[2026-01-20T07:50:01.168Z] 视频大小: 51.89 MB
+[2026-01-20T07:50:01.169Z] 开始下载视频流...
+[2026-01-20T07:50:07.953Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\14.mp4
+[2026-01-20T07:50:07.966Z] [音频] 开始提取: 14.mp3
+[2026-01-20T07:50:07.966Z]   音频提取失败: exec is not defined
+[2026-01-20T07:50:07.976Z] 
+[4/4] 开始处理 编号:15 类型:文章
+[2026-01-20T07:50:07.976Z] [文章] 正在处理: Anthropic一夜震撼升级：Claude获得「永久记忆」！全球打工人变天
+[2026-01-20T07:50:09.257Z] ✓ 文章已保存: D:\Auto Workbench\puppeteer\articles\2026-01-20\15.txt
+[2026-01-20T07:50:09.271Z] 
+=========================================
+[2026-01-20T07:50:09.271Z] 下载任务完成
+[2026-01-20T07:50:09.272Z] 成功: 4
+[2026-01-20T07:50:09.273Z] 失败: 0
+[2026-01-20T07:50:09.274Z] =========================================
+[2026-01-20T08:00:06.541Z] =========================================
+[2026-01-20T08:00:06.541Z] 今日头条收藏内容下载工具
+[2026-01-20T08:00:06.542Z] =========================================
+[2026-01-20T08:00:06.565Z] 待处理任务: 4 条
+[2026-01-20T08:00:06.566Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:00:06.566Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:00:07.242Z] 
+[1/4] 开始处理 编号:12 类型:文章
+[2026-01-20T08:00:07.243Z] [文章] 正在处理: 用第一性原理拆解 Agentic Coding：从理论到实操
+[2026-01-20T08:00:10.055Z] ✓ 文章已保存: D:\Auto Workbench\puppeteer\articles\2026-01-20\12.txt
+[2026-01-20T08:00:10.078Z] 
+[2/4] 开始处理 编号:13 类型:视频
+[2026-01-20T08:00:10.079Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T08:00:16.375Z] 找到视频地址: https://v6-web.toutiaovod.com/b034698d87069752c1f5...
+[2026-01-20T08:00:16.677Z] 视频大小: 42.07 MB
+[2026-01-20T08:00:16.678Z] 开始下载视频流...
+[2026-01-20T08:00:19.643Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T08:00:19.657Z] [音频] 开始提取: 13.mp3
+[2026-01-20T08:00:19.757Z] [音频] 提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000022994c19240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:00:19.758Z]   音频提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000022994c19240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:00:19.770Z] 
+[3/4] 开始处理 编号:14 类型:视频
+[2026-01-20T08:00:19.771Z] [视频] 正在处理: OpenCode 实测｜从零开发一个 AI 应用 OpenC
+[2026-01-20T08:00:25.850Z] 找到视频地址: https://v26-web.toutiaovod.com/8ab7a9d2b31582a38ec...
+[2026-01-20T08:00:26.142Z] 视频大小: 51.89 MB
+[2026-01-20T08:00:26.142Z] 开始下载视频流...
+[2026-01-20T08:00:29.418Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\14.mp4
+[2026-01-20T08:00:29.439Z] [音频] 开始提取: 14.mp3
+[2026-01-20T08:00:43.624Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\14.mp3
+[2026-01-20T08:00:43.632Z] 
+[4/4] 开始处理 编号:15 类型:文章
+[2026-01-20T08:00:43.632Z] [文章] 正在处理: Anthropic一夜震撼升级：Claude获得「永久记忆」！全球打工人变天
+[2026-01-20T08:00:45.813Z] ✓ 文章已保存: D:\Auto Workbench\puppeteer\articles\2026-01-20\15.txt
+[2026-01-20T08:00:45.827Z] 
+=========================================
+[2026-01-20T08:00:45.827Z] 下载任务完成
+[2026-01-20T08:00:45.828Z] 成功: 4
+[2026-01-20T08:00:45.828Z] 失败: 0
+[2026-01-20T08:00:45.829Z] =========================================
+[2026-01-20T08:10:58.278Z] =========================================
+[2026-01-20T08:10:58.279Z] 今日头条收藏内容下载工具
+[2026-01-20T08:10:58.280Z] =========================================
+[2026-01-20T08:10:58.318Z] 待处理任务: 1 条
+[2026-01-20T08:10:58.319Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:10:58.320Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:10:58.968Z] 
+[1/1] 开始处理 编号:13 类型:视频
+[2026-01-20T08:10:58.969Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T08:11:03.132Z]   捕获视频流: https://v6-web.toutiaovod.com/4d85a19090541bcf7b5c...
+[2026-01-20T08:11:07.931Z]   仅检测到单一视频流 (或未捕获音频)，直接下载...
+[2026-01-20T08:11:10.362Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T08:11:10.399Z] [音频] 开始提取: 13.mp3
+[2026-01-20T08:11:10.497Z] [音频] 提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000024e367e9240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:11:10.497Z]   音频提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000024e367e9240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:11:10.510Z] 
+=========================================
+[2026-01-20T08:11:10.511Z] 下载任务完成
+[2026-01-20T08:11:10.512Z] 成功: 1
+[2026-01-20T08:11:10.512Z] 失败: 0
+[2026-01-20T08:11:10.512Z] =========================================
+[2026-01-20T08:18:53.805Z] =========================================
+[2026-01-20T08:18:53.806Z] 今日头条收藏内容下载工具
+[2026-01-20T08:18:53.806Z] =========================================
+[2026-01-20T08:18:53.845Z] 待处理任务: 1 条
+[2026-01-20T08:18:53.846Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:18:53.846Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:18:54.501Z] 
+[1/1] 开始处理 编号:13 类型:视频
+[2026-01-20T08:18:54.502Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T08:18:56.789Z]   捕获视频流: https://v3-web.toutiaovod.com/d4460caadf6f4fb82693...
+[2026-01-20T08:19:01.885Z]   仅检测到单一视频流 (或未捕获音频)，直接下载...
+[2026-01-20T08:19:02.765Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T08:19:02.804Z] [音频] 开始提取: 13.mp3
+[2026-01-20T08:19:12.549Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3
+[2026-01-20T08:19:12.561Z] 
+=========================================
+[2026-01-20T08:19:12.562Z] 下载任务完成
+[2026-01-20T08:19:12.562Z] 成功: 1
+[2026-01-20T08:19:12.563Z] 失败: 0
+[2026-01-20T08:19:12.564Z] =========================================
+[2026-01-20T08:22:16.253Z] =========================================
+[2026-01-20T08:22:16.254Z] 今日头条收藏内容下载工具
+[2026-01-20T08:22:16.254Z] =========================================
+[2026-01-20T08:22:16.278Z] 待处理任务: 1 条
+[2026-01-20T08:22:16.279Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:22:16.280Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:22:16.970Z] 
+[1/1] 开始处理 编号:16 类型:视频
+[2026-01-20T08:22:16.971Z] [视频] 正在处理: 🚀手把手教你在手机上部署腾讯混元翻译模型，完全离线永久免费
+[2026-01-20T08:22:19.095Z]   捕获视频流: https://v26-web.toutiaovod.com/86c0f77f469b9249a42...
+[2026-01-20T08:22:23.893Z]   仅检测到单一视频流 (或未捕获音频)，直接下载...
+[2026-01-20T08:22:24.905Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\16.mp4
+[2026-01-20T08:22:24.932Z] [音频] 开始提取: 16.mp3
+[2026-01-20T08:22:31.659Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\16.mp3
+[2026-01-20T08:22:31.670Z] 
+=========================================
+[2026-01-20T08:22:31.671Z] 下载任务完成
+[2026-01-20T08:22:31.671Z] 成功: 1
+[2026-01-20T08:22:31.672Z] 失败: 0
+[2026-01-20T08:22:31.672Z] =========================================
+[2026-01-20T08:23:42.801Z] =========================================
+[2026-01-20T08:23:42.802Z] 今日头条收藏内容下载工具
+[2026-01-20T08:23:42.803Z] =========================================
+[2026-01-20T08:23:42.826Z] 待处理任务: 1 条
+[2026-01-20T08:23:42.826Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:23:42.827Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:23:43.477Z] 
+[1/1] 开始处理 编号:17 类型:视频
+[2026-01-20T08:23:43.478Z] [视频] 正在处理: 单依纯&侯明昊合唱《微光》嗓音干净柔情，值得奔赴的希望，好听
+[2026-01-20T08:23:45.759Z]   捕获视频流: https://v6-web.toutiaovod.com/0215201e42426fc153df...
+[2026-01-20T08:23:50.507Z]   仅检测到单一视频流 (或未捕获音频)，直接下载...
+[2026-01-20T08:23:53.991Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4
+[2026-01-20T08:23:54.016Z] [音频] 开始提取: 17.mp3
+[2026-01-20T08:23:59.350Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3
+[2026-01-20T08:23:59.364Z] 
+=========================================
+[2026-01-20T08:23:59.365Z] 下载任务完成
+[2026-01-20T08:23:59.366Z] 成功: 1
+[2026-01-20T08:23:59.366Z] 失败: 0
+[2026-01-20T08:23:59.367Z] =========================================
+[2026-01-20T08:33:15.289Z] =========================================
+[2026-01-20T08:33:15.290Z] 今日头条收藏内容下载工具
+[2026-01-20T08:33:15.290Z] =========================================
+[2026-01-20T08:33:15.313Z] 待处理任务: 2 条
+[2026-01-20T08:33:15.314Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:33:15.314Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:33:16.002Z] 
+[1/2] 开始处理 编号:16 类型:视频
+[2026-01-20T08:33:16.003Z] [视频] 正在处理: 单依纯&侯明昊合唱《微光》嗓音干净柔情，值得奔赴的希望，好听
+[2026-01-20T08:33:17.821Z] 等待媒体流捕获 (10秒)...
+[2026-01-20T08:33:27.836Z] 捕获到 1 个媒体流请求
+[2026-01-20T08:33:27.837Z]   - [video] video/mp4 Size:0 URL:https://v3-web.toutiaovod.com/b77e443257c94db1c2b9...
+[2026-01-20T08:33:27.838Z] 下载主视频流: https://v3-web.toutiaovod.com/b77e443257c94db1c2b9...
+[2026-01-20T08:33:36.270Z] 主文件流检查: Video=true, Audio=true
+[2026-01-20T08:33:36.271Z] 仅有视频文件，直接保存...
+[2026-01-20T08:33:36.272Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\16.mp4
+[2026-01-20T08:33:36.301Z] [音频] 开始提取: 16.mp3
+[2026-01-20T08:33:41.568Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\16.mp3
+[2026-01-20T08:33:41.582Z] 
+[2/2] 开始处理 编号:17 类型:视频
+[2026-01-20T08:33:41.582Z] [视频] 正在处理: 🚀手把手教你在手机上部署腾讯混元翻译模型，完全离线永久免费
+[2026-01-20T08:33:42.855Z] 等待媒体流捕获 (10秒)...
+[2026-01-20T08:33:52.868Z] 捕获到 2 个媒体流请求
+[2026-01-20T08:33:52.869Z]   - [video] video/mp4 Size:0 URL:https://v26-web.toutiaovod.com/b063a748e14f3db9fb3...
+[2026-01-20T08:33:52.869Z]   - [video] video/mp4 Size:0 URL:https://v26-web.toutiaovod.com/91d291555d4b92275ff...
+[2026-01-20T08:33:52.870Z] 下载主视频流: https://v26-web.toutiaovod.com/b063a748e14f3db9fb3...
+[2026-01-20T08:33:56.158Z] 主文件流检查: Video=true, Audio=false
+[2026-01-20T08:33:56.158Z] 警告: 视频文件没有声音，且未找到独立音频流。
+[2026-01-20T08:33:56.159Z] 仅有视频文件，直接保存...
+[2026-01-20T08:33:56.160Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4
+[2026-01-20T08:33:56.172Z] [音频] 开始提取: 17.mp3
+[2026-01-20T08:33:56.235Z] [音频] 提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0300fg10000d5kuspfog65omsci08mg
+    encoder         : Lavf58.76.100
+  Duration: 00:07:43.33, start: 0.000000, bitrate: 307 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1280x720 [SAR 1:1 DAR 16:9], 1053 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3':
+[out#0/mp3 @ 00000248a3950040] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:33:56.236Z]   音频提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0300fg10000d5kuspfog65omsci08mg
+    encoder         : Lavf58.76.100
+  Duration: 00:07:43.33, start: 0.000000, bitrate: 307 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1280x720 [SAR 1:1 DAR 16:9], 1053 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3':
+[out#0/mp3 @ 00000248a3950040] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\17.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:33:56.245Z] 
+=========================================
+[2026-01-20T08:33:56.246Z] 下载任务完成
+[2026-01-20T08:33:56.246Z] 成功: 2
+[2026-01-20T08:33:56.246Z] 失败: 0
+[2026-01-20T08:33:56.247Z] =========================================
+[2026-01-20T08:36:34.890Z] =========================================
+[2026-01-20T08:36:34.891Z] 今日头条收藏内容下载工具
+[2026-01-20T08:36:34.892Z] =========================================
+[2026-01-20T08:36:34.916Z] 待处理任务: 3 条
+[2026-01-20T08:36:34.916Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:36:34.917Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:36:35.702Z] 
+[1/3] 开始处理 编号:13 类型:视频
+[2026-01-20T08:36:35.704Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T08:36:37.721Z] 等待媒体流捕获 (10秒)...
+[2026-01-20T08:36:47.723Z] 捕获到 2 个媒体流请求
+[2026-01-20T08:36:47.724Z]   - [video] video/mp4 Size:0 URL:https://v9-web.toutiaovod.com/d8a4366f056b0832cea0...
+[2026-01-20T08:36:47.725Z]   - [video] video/mp4 Size:0 URL:https://v9-web.toutiaovod.com/663d96737a1de02dc508...
+[2026-01-20T08:36:47.725Z] 下载主视频流: https://v9-web.toutiaovod.com/d8a4366f056b0832cea0...
+[2026-01-20T08:36:51.873Z] 主文件流检查: Video=true, Audio=false
+[2026-01-20T08:36:51.874Z] 警告: 视频文件没有声音，且未找到独立音频流。
+[2026-01-20T08:36:51.874Z] 仅有视频文件，直接保存...
+[2026-01-20T08:36:51.875Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T08:36:51.906Z] [音频] 开始提取: 13.mp3
+[2026-01-20T08:36:51.978Z] [音频] 提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000025b2c249240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:36:51.979Z]   音频提取失败: Command failed: ffmpeg -i "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4" -vn -ar 44100 -ac 2 -b:a 192k -f mp3 "D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3" -y
+ffmpeg version 2025-05-01-git-707c04fe06-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15.1.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      60.  2.100 / 60.  2.100
+  libavcodec     62.  1.102 / 62.  1.102
+  libavformat    62.  0.102 / 62.  0.102
+  libavdevice    62.  0.100 / 62.  0.100
+  libavfilter    11.  0.100 / 11.  0.100
+  libswscale      9.  0.100 /  9.  0.100
+  libswresample   6.  0.100 /  6.  0.100
+  libpostproc    59.  1.100 / 59.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41iso5
+    comment         : vid:v0d00fg10000d5i4shnog65tf17o2a80
+    encoder         : Lavf58.76.100
+  Duration: 00:12:29.70, start: 0.000000, bitrate: 470 kb/s
+  Stream #0:0[0x2](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 1332 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : Bento4 Video Handler
+      vendor_id       : [0][0][0][0]
+Output #0, mp3, to 'D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3':
+[out#0/mp3 @ 0000025b2c249240] Output file does not contain any stream
+Error opening output file D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3.
+Error opening output files: Invalid argument
+
+[2026-01-20T08:36:51.991Z] 
+[2/3] 开始处理 编号:14 类型:视频
+[2026-01-20T08:36:51.992Z] [视频] 正在处理: OpenCode 实测｜从零开发一个 AI 应用 OpenC
+[2026-01-20T08:36:53.014Z] 等待媒体流捕获 (10秒)...
+[2026-01-20T08:37:03.019Z] 捕获到 1 个媒体流请求
+[2026-01-20T08:37:03.019Z]   - [video] video/mp4 Size:0 URL:https://v6-web.toutiaovod.com/e4e6f4be23bad31c03eb...
+[2026-01-20T08:37:03.020Z] 下载主视频流: https://v6-web.toutiaovod.com/e4e6f4be23bad31c03eb...
+[2026-01-20T08:37:07.242Z] 主文件流检查: Video=true, Audio=true
+[2026-01-20T08:37:07.243Z] 仅有视频文件，直接保存...
+[2026-01-20T08:37:07.244Z] ✓ 视频已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\14.mp4
+[2026-01-20T08:37:07.256Z] [音频] 开始提取: 14.mp3
+[2026-01-20T08:37:21.008Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\14.mp3
+[2026-01-20T08:37:21.016Z] 
+[3/3] 开始处理 编号:15 类型:文章
+[2026-01-20T08:37:21.017Z] [文章] 正在处理: Anthropic一夜震撼升级：Claude获得「永久记忆」！全球打工人变天
+[2026-01-20T08:37:22.280Z] ✓ 文章已保存: D:\Auto Workbench\puppeteer\articles\2026-01-20\15.txt
+[2026-01-20T08:37:22.287Z] 
+=========================================
+[2026-01-20T08:37:22.288Z] 下载任务完成
+[2026-01-20T08:37:22.288Z] 成功: 3
+[2026-01-20T08:37:22.289Z] 失败: 0
+[2026-01-20T08:37:22.290Z] =========================================
+[2026-01-20T08:42:35.346Z] =========================================
+[2026-01-20T08:42:35.347Z] 今日头条收藏内容下载工具
+[2026-01-20T08:42:35.348Z] =========================================
+[2026-01-20T08:42:35.386Z] 待处理任务: 1 条
+[2026-01-20T08:42:35.387Z] 文章保存路径: D:\Auto Workbench\puppeteer\articles
+[2026-01-20T08:42:35.389Z] 视频保存路径: D:\Auto Workbench\puppeteer\videos
+[2026-01-20T08:42:36.057Z] 
+[1/1] 开始处理 编号:13 类型:视频
+[2026-01-20T08:42:36.059Z] [视频] 正在处理: Superpowers让Claude Code写出工程级代码 🚀告别Vibe Coding
+[2026-01-20T08:42:38.063Z] 等待媒体流捕获 (10秒)...
+[2026-01-20T08:42:48.071Z] 捕获到 3 个媒体流请求
+[2026-01-20T08:42:48.072Z]   - [video] video/mp4 Size:0 URL:https://v6-web.toutiaovod.com/5fcf982d06163386a8fe...
+[2026-01-20T08:42:48.072Z]   - [video] video/mp4 Size:0 URL:https://v6-web.toutiaovod.com/9cc89bb4d9714007dccd...
+[2026-01-20T08:42:48.073Z]   - [video] video/mp4 Size:0 URL:https://v6-web.toutiaovod.com/8091176ff388701c3d6b...
+[2026-01-20T08:42:48.074Z] 下载主视频流: https://v6-web.toutiaovod.com/5fcf982d06163386a8fe...
+[2026-01-20T08:42:50.627Z] 主文件流检查: Video=true, Audio=false
+[2026-01-20T08:42:50.627Z] 主视频没有声音，尝试从其他候选流中寻找音频...
+[2026-01-20T08:42:50.628Z]   检查候选流: https://v6-web.toutiaovod.com/9cc89bb4d9714007dccd...
+[2026-01-20T08:42:51.097Z]   候选流检查: Video=false, Audio=true
+[2026-01-20T08:42:51.098Z]   -> 找到音频流！
+[2026-01-20T08:42:51.099Z] 下载音频流: https://v6-web.toutiaovod.com/9cc89bb4d9714007dccd...
+[2026-01-20T08:42:51.422Z] 检测到独立的视频和音频文件，开始合并...
+[2026-01-20T08:42:51.790Z] ✓ 视频(合并版)已保存: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp4
+[2026-01-20T08:42:51.826Z] [音频] 开始提取: 13.mp3
+[2026-01-20T08:43:01.728Z] ✓ [音频] 提取成功: D:\Auto Workbench\puppeteer\videos\2026-01-20\13.mp3
+[2026-01-20T08:43:01.740Z] 
+=========================================
+[2026-01-20T08:43:01.741Z] 下载任务完成
+[2026-01-20T08:43:01.741Z] 成功: 1
+[2026-01-20T08:43:01.742Z] 失败: 0
+[2026-01-20T08:43:01.742Z] =========================================
