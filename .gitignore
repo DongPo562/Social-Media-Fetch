@@ -1,6 +1,8 @@
 /videos/
 /articles/
 /user_data/
+/mindmap/
+/articles_markdown/
 
 node_modules/
 dist/
