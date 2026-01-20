@@ -1,0 +1,8 @@
+[2026-01-19T12:17:08.858Z] 运行出错
+TypeError: page.waitForTimeout is not a function
+    at D:\Auto Workbench\puppeteer\get_favorite.js:200:20
+
+[2026-01-19T12:17:53.573Z] 运行出错
+TypeError: page.$x is not a function
+    at D:\Auto Workbench\puppeteer\get_favorite.js:206:36
+
