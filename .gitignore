@@ -1,31 +1,41 @@
-# Dependencies
+/videos/
+/articles/
+/user_data/
+
 node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+.turbo/
+.next/
+out/
+.vite/
+.eslintcache/
 
-# User specified ignores
-videos/
-articles/
-
-# User Data (Browser Profile)
-user_data/
-
-# Logs
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
-*log.txt
+pnpm-debug.log*
 
-# OS
-.DS_Store
-Thumbs.db
-~$*
+.env
+.env.*
+!.env.example
 
-# IDE
 .vscode/
 .idea/
 .trae/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.bak
 
-# Environment variables
-.env
+.pnp
+.pnp.js
+.pnpm-store/
