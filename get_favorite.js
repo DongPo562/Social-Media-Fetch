@@ -16,6 +16,7 @@ try {
 const TOUTIAO_CONFIG = config.TouTiao || {};
 const ADVANCED_CONFIG = config.Advanced || {};
 const DOWNLOAD_CONFIG = config.Download || {};
+const NOTION_CONFIG = config.Notion || {};
 
 const FETCH_COUNT = parseInt(TOUTIAO_CONFIG.fetch_count || 10);
 const EXCEL_PATH = path.resolve(__dirname, TOUTIAO_CONFIG.excel_path || 'favorite.xlsx');
@@ -24,6 +25,17 @@ const RETRY_TIMES = parseInt(ADVANCED_CONFIG.retry_times || 3);
 const TIMEOUT = parseInt(ADVANCED_CONFIG.timeout || 30000);
 const ENABLE_LOG = ADVANCED_CONFIG.enable_log !== false;
 const HEADLESS = ADVANCED_CONFIG.headless === true || ADVANCED_CONFIG.headless === 'true';
+
+// Notion Check
+if (NOTION_CONFIG.enable_notion_sync === true || NOTION_CONFIG.enable_notion_sync === 'true') {
+    if (!NOTION_CONFIG.parent_page_id) {
+        console.log("\n=========================================");
+        console.log("⚠️  提示: Notion同步功能已开启，但未配置 parent_page_id");
+        console.log("请在 config.ini 中设置 [Notion] parent_page_id");
+        console.log("您可以打开 Notion 页面，从 URL 中复制 ID (例如: 32位字符串)");
+        console.log("=========================================\n");
+    }
+}
 
 // Logging Helpers
 function log(msg) {
@@ -76,19 +88,23 @@ function initializeExcel() {
         const hasMediaType = '媒体类型' in firstRow;
         const hasIsDownloaded = '是否下载' in firstRow;
         const hasLocalPath = '本地地址' in firstRow;
+        const hasNotionStatus = 'Notion状态' in firstRow;
+        const hasNotionLink = 'Notion链接' in firstRow;
 
-        if (!hasMediaType || !hasIsDownloaded || !hasLocalPath) {
+        if (!hasMediaType || !hasIsDownloaded || !hasLocalPath || !hasNotionStatus || !hasNotionLink) {
             log("检测到缺失列，正在初始化...");
             
             data = data.map(row => {
                 if (!('媒体类型' in row)) row['媒体类型'] = '视频'; // Default to Video for old data
                 if (!('是否下载' in row)) row['是否下载'] = 1;      // Default to Downloaded (skip) for old data
                 if (!('本地地址' in row)) row['本地地址'] = '';
+                if (!('Notion状态' in row)) row['Notion状态'] = 0;
+                if (!('Notion链接' in row)) row['Notion链接'] = '';
                 return row;
             });
 
             const newSheet = XLSX.utils.json_to_sheet(data, { 
-                header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址'] 
+                header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态', 'Notion状态', 'Notion链接'] 
             });
             workbook.Sheets[sheetName] = newSheet;
             XLSX.writeFile(workbook, EXCEL_PATH);
@@ -148,13 +164,15 @@ function saveExcelData(newData) {
             '保存日期': new Date().toISOString().split('T')[0],
             '是否下载': 0, // New items default to not downloaded
             '本地地址': '',
-            '音频状态': ''
+            '音频状态': '',
+            'Notion状态': 0,
+            'Notion链接': ''
         }));
 
         const allData = existingData.concat(finalData);
         // Ensure correct column order
         const sheetWithHeader = XLSX.utils.json_to_sheet(allData, { 
-            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
+            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态', 'Notion状态', 'Notion链接'] 
         });
 
         if (workbook.SheetNames.length === 0) {
@@ -248,16 +266,36 @@ async function autoScroll(page) {
         log(`进入个人中心: ${userHref}`);
         
         await page.goto(userHref, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+        
+        // Debug: Print current URL and Title
+        const currentUrl = page.url();
+        const currentTitle = await page.title();
+        log(`当前页面: ${currentTitle} (${currentUrl})`);
 
         log("正在寻找'收藏'标签...");
-        await new Promise(r => setTimeout(r, 1000)); 
+        await new Promise(r => setTimeout(r, 2000)); 
 
+        // Strategy 1: Direct URL Navigation (if userHref is user profile)
+        // If currentUrl looks like /c/user/12345/ or has token, try to navigate to favorite directly
+        if (currentUrl.includes('/c/user/') && !currentUrl.includes('/favorite')) {
+             // Check if we can find user ID
+             const match = currentUrl.match(/\/c\/user\/(\d+|token\/[^/?]+)/);
+             if (match) {
+                 const userIdPart = match[1];
+                 // If it is a token URL, we might need to rely on the browser to resolve it to a standard ID first.
+                 // But let's try to find a "Favorite" link first.
+             }
+        }
+
+        // Strategy 2: Click on Tab
         let clicked = await page.evaluate(() => {
             const xpaths = [
                 "//div[contains(text(), '收藏')]",
                 "//span[contains(text(), '收藏')]",
                 "//li[contains(text(), '收藏')]",
-                "//a[contains(text(), '收藏')]"
+                "//a[contains(text(), '收藏')]",
+                "//div[contains(@class, 'tab')]//div[contains(text(), '收藏')]",
+                "//ul//li//span[contains(text(), '收藏')]"
             ];
             
             for (const xpath of xpaths) {
@@ -268,8 +306,9 @@ async function autoScroll(page) {
                     return true;
                 }
             }
-            // Fallback: search all text
-            const elements = document.querySelectorAll('div, li, span, a');
+            
+            // Fallback: search all text in common containers
+            const elements = document.querySelectorAll('div[class*="tab"], li, span, a[class*="tab"]');
             for (let el of elements) {
                 if (el.innerText && el.innerText.trim() === '收藏') {
                     el.click();
@@ -279,10 +318,45 @@ async function autoScroll(page) {
             return false;
         });
 
+        // Strategy 3: Direct URL construction if click failed
         if (!clicked) {
-            throw new Error("未找到'收藏'标签，请检查页面结构或登录状态");
+             log("尝试直接跳转到收藏页面...");
+             // Usually it's current URL + 'favorite/' or '?tab=favorite'
+             // If the current URL ends with /, append favorite/. If not, append /favorite/
+             let targetUrl = currentUrl;
+             // Remove query params
+             targetUrl = targetUrl.split('?')[0];
+             if (!targetUrl.endsWith('/')) targetUrl += '/';
+             
+             // If we are at /c/user/token/..., this might not work directly if it redirects.
+             // But let's try appending 'favorite/'
+             if (!targetUrl.includes('favorite')) {
+                 targetUrl += 'favorite/';
+                 try {
+                     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+                     clicked = true;
+                     log(`已尝试跳转: ${targetUrl}`);
+                 } catch(e) {
+                     log(`跳转失败: ${e.message}`);
+                 }
+             }
         }
-        log("已点击收藏标签");
+
+        if (!clicked) {
+             // Final check: maybe we are already there?
+             const isFavoritePage = await page.evaluate(() => {
+                 return document.title.includes('收藏') || window.location.href.includes('favorite');
+             });
+             if (isFavoritePage) {
+                 log("当前已在收藏页面");
+                 clicked = true;
+             }
+        }
+
+        if (!clicked) {
+            throw new Error("未找到'收藏'标签，且自动跳转失败。请检查页面结构或登录状态");
+        }
+        log("已进入收藏列表");
 
         // Wait and Scroll
         log("等待列表加载并滚动...");
@@ -474,6 +548,23 @@ async function autoScroll(page) {
                 
                 downloadProcess.on('close', (code) => {
                     log(`下载模块运行结束，退出码: ${code}`);
+
+                    // Trigger Notion Sync
+                    if (NOTION_CONFIG.enable_notion_sync === true || NOTION_CONFIG.enable_notion_sync === 'true') {
+                        if (NOTION_CONFIG.auto_sync_after_download === true || NOTION_CONFIG.auto_sync_after_download === 'true') {
+                             log("\n检测到自动同步配置开启，正在启动 Notion 同步模块...");
+                             try {
+                                const { spawn } = require('child_process');
+                                const syncProcess = spawn('node', ['sync_to_notion.js'], { stdio: 'inherit', cwd: __dirname });
+                                
+                                syncProcess.on('close', (syncCode) => {
+                                    log(`Notion 同步模块运行结束，退出码: ${syncCode}`);
+                                });
+                             } catch (e) {
+                                 errorLog("启动 Notion 同步模块失败", e);
+                             }
+                        }
+                    }
                 });
             } catch (e) {
                 errorLog("启动下载模块失败", e);
