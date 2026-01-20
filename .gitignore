@@ -39,3 +39,5 @@ Thumbs.db
 .pnp
 .pnp.js
 .pnpm-store/
+
+*.txt
