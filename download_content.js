@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
-const XLSX = require('xlsx');
+const ExcelUtils = require('./excel_utils');
 const axios = require('axios');
 const { exec } = require('child_process');
 
@@ -62,29 +62,24 @@ function ensureDir(dir) {
     }
 }
 
-function getExcelData() {
-    if (!fs.existsSync(EXCEL_PATH)) return [];
-    const workbook = XLSX.readFile(EXCEL_PATH);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(sheet);
+async function getExcelData() {
+    try {
+        return await ExcelUtils.readExcelData(EXCEL_PATH);
+    } catch (e) {
+        errorLog("读取Excel失败", e);
+        return [];
+    }
 }
 
-function updateExcelStatus(id, status, localPath, errorMsg = '') {
-    const workbook = XLSX.readFile(EXCEL_PATH);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet);
-
-    const index = data.findIndex(r => r['编号'] == id);
-    if (index !== -1) {
-        data[index]['是否下载'] = status;
-        data[index]['本地地址'] = localPath || errorMsg;
-        
-        const newSheet = XLSX.utils.json_to_sheet(data, { 
-            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
-        });
-        workbook.Sheets[sheetName] = newSheet;
-        XLSX.writeFile(workbook, EXCEL_PATH);
+async function updateExcelStatus(link, status, localPath, errorMsg = '') {
+    try {
+        const updates = {
+            '是否下载': status,
+            '本地地址': localPath || errorMsg
+        };
+        await ExcelUtils.updateExcelRow(EXCEL_PATH, '链接', link, updates);
+    } catch (e) {
+        errorLog("更新状态失败", e);
     }
 }
 
@@ -122,13 +117,23 @@ async function downloadArticle(page, item) {
         if (h1) title = h1.innerText.trim();
 
         // Content
-        // Priority: specific article containers
-        let contentEl = document.querySelector('article') || 
-                        document.querySelector('.article-content') || 
-                        document.querySelector('.tt-article-content'); // Toutiao specific class often used
+        let contentEl = null;
+        const isWeitoutiao = window.location.href.includes('/w/');
+
+        if (isWeitoutiao) {
+             // Micro headline specific selectors
+             contentEl = document.querySelector('.weitoutiao-html') || 
+                         document.querySelector('div[class*="wtt-content"]');
+        } else {
+             // Standard article selectors
+             contentEl = document.querySelector('article') || 
+                         document.querySelector('.article-content') || 
+                         document.querySelector('.tt-article-content'); // Toutiao specific class often used
+        }
         
         // Fallback: finding the container with most text paragraphs
-        if (!contentEl) {
+        // For Weitoutiao, we skip this heuristic fallback to ensure accurate error reporting
+        if (!contentEl && !isWeitoutiao) {
             const divs = document.querySelectorAll('div');
             let maxP = 0;
             for (const div of divs) {
@@ -503,23 +508,10 @@ function extractAudio(videoPath, item) {
     });
 }
 
-function updateExcelAudioStatus(id, status) {
+async function updateExcelAudioStatus(link, status) {
     try {
-        const workbook = XLSX.readFile(EXCEL_PATH);
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const data = XLSX.utils.sheet_to_json(sheet);
-
-        const index = data.findIndex(r => r['编号'] == id);
-        if (index !== -1) {
-            data[index]['音频状态'] = status;
-            
-            const newSheet = XLSX.utils.json_to_sheet(data, { 
-                header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态'] 
-            });
-            workbook.Sheets[sheetName] = newSheet;
-            XLSX.writeFile(workbook, EXCEL_PATH);
-        }
+        const updates = { '音频状态': status };
+        await ExcelUtils.updateExcelRow(EXCEL_PATH, '链接', link, updates);
     } catch (e) {
         errorLog("更新音频状态失败", e);
     }
@@ -538,7 +530,7 @@ function updateExcelAudioStatus(id, status) {
     log("今日头条收藏内容下载工具");
     log("=========================================");
 
-    const allData = getExcelData();
+    const allData = await getExcelData();
     let tasks = allData.filter(item => {
         const status = parseInt(item['是否下载']);
         if (status === 0) return true;
@@ -591,12 +583,12 @@ function updateExcelAudioStatus(id, status) {
                 } else {
                     log("  跳过: 未知媒体类型");
                     // Treat as handled but skipped
-                    updateExcelStatus(item['编号'], 1, "Skipped: Unknown Type");
+                    await updateExcelStatus(item['链接'], 1, "Skipped: Unknown Type");
                     success = true; 
                     continue;
                 }
                 
-                updateExcelStatus(item['编号'], 1, localPath);
+                await updateExcelStatus(item['链接'], 1, localPath);
                 success = true;
                 successCount++;
 
@@ -604,10 +596,10 @@ function updateExcelAudioStatus(id, status) {
                 if (item['媒体类型'] === '视频' && ENABLE_AUDIO_EXTRACT) {
                     try {
                         await extractAudio(localPath, item);
-                        updateExcelAudioStatus(item['编号'], '已提取');
+                        await updateExcelAudioStatus(item['链接'], '已提取');
                     } catch (ae) {
                         log(`  音频提取失败: ${ae.message}`);
-                        updateExcelAudioStatus(item['编号'], '提取失败');
+                        await updateExcelAudioStatus(item['链接'], '提取失败');
                     }
                 }
 
@@ -621,7 +613,7 @@ function updateExcelAudioStatus(id, status) {
         }
 
         if (!success) {
-            updateExcelStatus(item['编号'], 2, '', errorMsg);
+            await updateExcelStatus(item['链接'], 2, '', errorMsg);
             errorLog(`下载失败 编号:${item['编号']}`, { message: errorMsg, stack: '' }, item);
             failCount++;
         }

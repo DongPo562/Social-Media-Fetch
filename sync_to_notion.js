@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
-const XLSX = require('xlsx');
+const ExcelUtils = require('./excel_utils');
 const { spawn } = require('child_process');
 
 // Load Config
@@ -41,33 +41,24 @@ function errorLog(msg, error) {
 }
 
 // Excel Helpers
-function getExcelData() {
-    if (!fs.existsSync(EXCEL_PATH)) return [];
-    const workbook = XLSX.readFile(EXCEL_PATH);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(sheet);
+async function getExcelData() {
+    try {
+        return await ExcelUtils.readExcelData(EXCEL_PATH);
+    } catch (e) {
+        errorLog("读取Excel失败", e);
+        return [];
+    }
 }
 
-function updateExcelNotionStatus(id, status, notionUrl = '') {
+async function updateExcelNotionStatus(link, status, notionUrl = '') {
     try {
-        const workbook = XLSX.readFile(EXCEL_PATH);
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        let data = XLSX.utils.sheet_to_json(sheet);
-
-        const index = data.findIndex(r => r['编号'] == id);
-        if (index !== -1) {
-            data[index]['Notion状态'] = status;
-            if (notionUrl) {
-                data[index]['Notion链接'] = notionUrl;
-            }
-            
-            // Re-generate sheet with new columns if they didn't exist
-            const header = ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态', 'Notion状态', 'Notion链接'];
-            const newSheet = XLSX.utils.json_to_sheet(data, { header });
-            workbook.Sheets[sheetName] = newSheet;
-            XLSX.writeFile(workbook, EXCEL_PATH);
+        const updates = {
+            'Notion状态': status
+        };
+        if (notionUrl) {
+            updates['Notion链接'] = notionUrl;
         }
+        await ExcelUtils.updateExcelRow(EXCEL_PATH, '链接', link, updates);
     } catch (e) {
         errorLog("更新Excel失败", e);
     }
@@ -240,7 +231,7 @@ async function syncToNotion(item) {
     log("开始 Notion 同步流程");
     log("=========================================");
 
-    const allData = getExcelData();
+    const allData = await getExcelData();
     const tasks = allData.filter(item => {
         if (item['媒体类型'] !== '文章') return false;
         
@@ -273,12 +264,12 @@ async function syncToNotion(item) {
 
             const notionUrl = await syncToNotion(item);
             log(`  ✓ 同步成功!`);
-            updateExcelNotionStatus(item['编号'], 1, notionUrl);
+            await updateExcelNotionStatus(item['链接'], 1, notionUrl);
             successCount++;
         } catch (e) {
             log(`  ✗ 失败: ${e.message}`);
             errorLog(`同步失败: ${item['标题']}`, e);
-            updateExcelNotionStatus(item['编号'], 2);
+            await updateExcelNotionStatus(item['链接'], 2);
             failCount++;
         }
     }

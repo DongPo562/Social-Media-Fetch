@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const ini = require('ini');
-const XLSX = require('xlsx');
+const ExcelUtils = require('./excel_utils');
 
 // Load Config
 const configPath = path.join(__dirname, 'config.ini');
@@ -25,6 +25,8 @@ const RETRY_TIMES = parseInt(ADVANCED_CONFIG.retry_times || 3);
 const TIMEOUT = parseInt(ADVANCED_CONFIG.timeout || 30000);
 const ENABLE_LOG = ADVANCED_CONFIG.enable_log !== false;
 const HEADLESS = ADVANCED_CONFIG.headless === true || ADVANCED_CONFIG.headless === 'true';
+const SCROLL_DISTANCE = parseInt(ADVANCED_CONFIG.scroll_distance || 100);
+const SCROLL_INTERVAL = parseInt(ADVANCED_CONFIG.scroll_interval || 100);
 
 // Notion Check
 if (NOTION_CONFIG.enable_notion_sync === true || NOTION_CONFIG.enable_notion_sync === 'true') {
@@ -65,86 +67,31 @@ function writeFetchLog(successCount, newCount, duplicateCount) {
 }
 
 // Excel Helpers
-function initializeExcel() {
-    if (!fs.existsSync(EXCEL_PATH)) {
-        return;
-    }
-    
+async function initializeExcel() {
     log("=========================================");
-    log("正在读取Excel文件...");
-    
+    log("正在检查/初始化Excel文件...");
     try {
-        const workbook = XLSX.readFile(EXCEL_PATH);
-        const sheetName = workbook.SheetNames[0];
-        if (!sheetName) return;
-        
-        let sheet = workbook.Sheets[sheetName];
-        let data = XLSX.utils.sheet_to_json(sheet);
-        
-        if (data.length === 0) return;
-
-        // Check for new columns
-        const firstRow = data[0];
-        const hasMediaType = '媒体类型' in firstRow;
-        const hasIsDownloaded = '是否下载' in firstRow;
-        const hasLocalPath = '本地地址' in firstRow;
-        const hasNotionStatus = 'Notion状态' in firstRow;
-        const hasNotionLink = 'Notion链接' in firstRow;
-
-        if (!hasMediaType || !hasIsDownloaded || !hasLocalPath || !hasNotionStatus || !hasNotionLink) {
-            log("检测到缺失列，正在初始化...");
-            
-            data = data.map(row => {
-                if (!('媒体类型' in row)) row['媒体类型'] = '视频'; // Default to Video for old data
-                if (!('是否下载' in row)) row['是否下载'] = 1;      // Default to Downloaded (skip) for old data
-                if (!('本地地址' in row)) row['本地地址'] = '';
-                if (!('Notion状态' in row)) row['Notion状态'] = 0;
-                if (!('Notion链接' in row)) row['Notion链接'] = '';
-                return row;
-            });
-
-            const newSheet = XLSX.utils.json_to_sheet(data, { 
-                header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态', 'Notion状态', 'Notion链接'] 
-            });
-            workbook.Sheets[sheetName] = newSheet;
-            XLSX.writeFile(workbook, EXCEL_PATH);
-            log(`已为${data.length}条老数据设置默认值`);
-            log("初始化完成");
-        }
+        await ExcelUtils.ensureExcelFile(EXCEL_PATH);
+        log("Excel文件检查完成");
     } catch (e) {
         errorLog("Excel初始化失败", e);
     }
 }
 
-function getExcelData() {
-    if (!fs.existsSync(EXCEL_PATH)) {
-        return [];
-    }
+async function getExcelData() {
     try {
-        const workbook = XLSX.readFile(EXCEL_PATH);
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        return XLSX.utils.sheet_to_json(sheet);
+        return await ExcelUtils.readExcelData(EXCEL_PATH);
     } catch (e) {
         errorLog("读取Excel文件失败", e);
         return [];
     }
 }
 
-function saveExcelData(newData) {
-    let workbook;
+async function saveExcelData(newData) {
     let existingData = [];
     
     try {
-        if (fs.existsSync(EXCEL_PATH)) {
-            workbook = XLSX.readFile(EXCEL_PATH);
-            const sheetName = workbook.SheetNames[0];
-            if (sheetName) {
-                existingData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-            }
-        } else {
-            workbook = XLSX.utils.book_new();
-        }
+        existingData = await ExcelUtils.readExcelData(EXCEL_PATH);
 
         let nextId = 1;
         if (existingData.length > 0) {
@@ -169,19 +116,7 @@ function saveExcelData(newData) {
             'Notion链接': ''
         }));
 
-        const allData = existingData.concat(finalData);
-        // Ensure correct column order
-        const sheetWithHeader = XLSX.utils.json_to_sheet(allData, { 
-            header: ['编号', '标题', '媒体类型', '分类', '链接', '保存日期', '是否下载', '本地地址', '音频状态', 'Notion状态', 'Notion链接'] 
-        });
-
-        if (workbook.SheetNames.length === 0) {
-            XLSX.utils.book_append_sheet(workbook, sheetWithHeader, "Favorites");
-        } else {
-            workbook.Sheets[workbook.SheetNames[0]] = sheetWithHeader;
-        }
-
-        XLSX.writeFile(workbook, EXCEL_PATH);
+        await ExcelUtils.appendExcelData(EXCEL_PATH, finalData);
         return finalData.length;
     } catch (e) {
         errorLog("保存Excel文件失败", e);
@@ -212,11 +147,11 @@ function cleanTitle(t) {
 }
 
 // Auto Scroll Function
-async function autoScroll(page) {
-    await page.evaluate(async () => {
+async function autoScroll(page, distanceVal, intervalVal) {
+    await page.evaluate(async (dist, intv) => {
         await new Promise((resolve) => {
             let totalHeight = 0;
-            let distance = 100;
+            let distance = dist;
             let timer = setInterval(() => {
                 let scrollHeight = document.body.scrollHeight;
                 window.scrollBy(0, distance);
@@ -226,24 +161,47 @@ async function autoScroll(page) {
                     clearInterval(timer);
                     resolve();
                 }
-            }, 100);
+            }, intv);
         });
-    });
+    }, distanceVal, intervalVal);
 }
 
 (async () => {
     // 1. Initialize Excel Columns if needed
-    initializeExcel();
+    await initializeExcel();
 
     log("开始抓取今日头条收藏列表");
     const browser = await puppeteer.launch({
         headless: HEADLESS,
         userDataDir: path.join(__dirname, 'user_data'),
         defaultViewport: null,
-        args: ['--start-maximized']
+        args: [
+            '--start-maximized',
+            '--no-sandbox',
+            '--disable-blink-features=AutomationControlled',
+            '--disable-infobars'
+        ]
     });
 
     const page = await browser.newPage();
+
+    // 1. Viewport Setting
+    if (HEADLESS) {
+        await page.setViewport({ width: 1920, height: 1080 });
+    }
+
+    // 2. Pre-injection Script (Stealth)
+    await page.evaluateOnNewDocument(() => {
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => false,
+        });
+        window.chrome = {
+            runtime: {},
+        };
+    });
+
+    // 3. User Agent (Windows 11 64-bit)
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
     try {
         log("正在访问今日头条首页...");
@@ -361,7 +319,7 @@ async function autoScroll(page) {
         // Wait and Scroll
         log("等待列表加载并滚动...");
         await new Promise(r => setTimeout(r, 2000));
-        await autoScroll(page);
+        await autoScroll(page, SCROLL_DISTANCE, SCROLL_INTERVAL);
         await new Promise(r => setTimeout(r, 1000));
 
         log(`正在提取前 ${FETCH_COUNT} 条内容...`);
@@ -371,7 +329,7 @@ async function autoScroll(page) {
             
             // Try broad selectors for items
             // Looking for blocks that might be cards
-            let potentialItems = Array.from(document.querySelectorAll('.feed-card-wrapper, .article-card, .wtt-feed-card, .card-container, div[class*="card"], div[class*="item"], div.profile-article-card-wrapper, div.profile-normal-video-card-wrapper'));
+            let potentialItems = Array.from(document.querySelectorAll('.feed-card-wrapper, .article-card, .wtt-feed-card, .card-container, div[class*="card"], div[class*="item"], div.profile-article-card-wrapper, div.profile-normal-video-card-wrapper, div.wtt-content, div[class*="wtt-feed"], div[class*="weitoutiao"]'));
             
             let validItems = potentialItems.filter(el => {
                 const link = el.querySelector('a');
@@ -422,13 +380,47 @@ async function autoScroll(page) {
             for (let i = 0; i < validItems.length && results.length < count; i++) {
                 const el = validItems[i];
                 
+                // Link
+                let link = '';
+                const linkEl = el.querySelector('a[href*="/group/"], a[href*="/item/"], a[href*="/video/"], a[href*="toutiao.com/a"], a[href*="/w/"]');
+                if (linkEl && !linkEl.href.includes('#comment')) {
+                    link = linkEl.href;
+                } else {
+                     const anyLinks = Array.from(el.querySelectorAll('a'));
+                     // Find first link that is not a comment link
+                     const contentLink = anyLinks.find(l => 
+                        (l.href.includes('/group/') || l.href.includes('/item/') || l.href.includes('/video/') || l.href.includes('toutiao.com/a') || l.href.includes('/article/') || l.href.includes('/w/')) && 
+                        !l.href.includes('#comment') && 
+                        !l.href.includes('comment_id=')
+                     );
+                     if (contentLink) link = contentLink.href;
+                }
+
                 // Type Detection
                 let type = "未知";
-                const className = el.className || "";
-                if (className.includes("article") || className.includes("profile-article-card-wrapper")) {
-                    type = "文章";
-                } else if (className.includes("video") || className.includes("profile-normal-video-card-wrapper")) {
-                    type = "视频";
+                
+                // 优先使用 URL 路径特征进行判断
+                if (link) {
+                    if (link.includes("/video/")) {
+                        type = "视频";
+                    } else if (link.includes("/article/") || link.includes("/w/")) {
+                        type = "文章";
+                    }
+                }
+
+                // 如果 URL 无法判断，尝试使用 DOM 特征
+                if (type === "未知") {
+                    const className = el.className || "";
+                    const hasArticleTag = el.querySelector('article') !== null;
+                    const hasWeitoutiaoHtml = el.querySelector('.weitoutiao-html') !== null;
+
+                    if (className.includes("wtt-content") || className.includes("weitoutiao") || hasArticleTag || hasWeitoutiaoHtml) {
+                        type = "文章";
+                    } else if (className.includes("article") || className.includes("profile-article-card-wrapper")) {
+                        type = "文章";
+                    } else if (className.includes("video") || className.includes("profile-normal-video-card-wrapper")) {
+                        type = "视频";
+                    }
                 }
 
                 // Title
@@ -448,22 +440,6 @@ async function autoScroll(page) {
                         }
                     });
                     if (!title) title = el.innerText.substring(0, 50);
-                }
-                
-                // Link
-                let link = '';
-                const linkEl = el.querySelector('a[href*="/group/"], a[href*="/item/"], a[href*="/video/"], a[href*="toutiao.com/a"]');
-                if (linkEl && !linkEl.href.includes('#comment')) {
-                    link = linkEl.href;
-                } else {
-                     const anyLinks = Array.from(el.querySelectorAll('a'));
-                     // Find first link that is not a comment link
-                     const contentLink = anyLinks.find(l => 
-                        (l.href.includes('/group/') || l.href.includes('/item/') || l.href.includes('/video/') || l.href.includes('toutiao.com/a') || l.href.includes('/article/')) && 
-                        !l.href.includes('#comment') && 
-                        !l.href.includes('comment_id=')
-                     );
-                     if (contentLink) link = contentLink.href;
                 }
                 
                 if (!link || !title) continue;
@@ -495,7 +471,7 @@ async function autoScroll(page) {
         });
         
         // Duplicate Check and Save
-        const existingData = getExcelData();
+        const existingData = await getExcelData();
         const existingLinks = new Set(existingData.map(r => r['链接']));
         const existingTitles = new Set(existingData.map(r => r['标题']));
 
@@ -527,7 +503,7 @@ async function autoScroll(page) {
         });
 
         if (newItems.length > 0) {
-            saveExcelData(newItems);
+            await saveExcelData(newItems);
             log(`\n数据已保存到 ${path.basename(EXCEL_PATH)}`);
         } else {
             log("\n没有新数据需要保存。");
