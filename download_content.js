@@ -85,7 +85,7 @@ async function updateExcelStatus(link, status, localPath, errorMsg = '') {
 
 async function downloadArticle(page, item) {
     log(`[文章] 正在处理: ${item['标题']}`);
-    
+
     // Create directory
     const dateStr = item['保存日期'] || new Date().toISOString().split('T')[0];
     const targetDir = path.join(ARTICLES_FOLDER, dateStr);
@@ -130,7 +130,7 @@ async function downloadArticle(page, item) {
                          document.querySelector('.article-content') || 
                          document.querySelector('.tt-article-content'); // Toutiao specific class often used
         }
-        
+
         // Fallback: finding the container with most text paragraphs
         // For Weitoutiao, we skip this heuristic fallback to ensure accurate error reporting
         if (!contentEl && !isWeitoutiao) {
@@ -170,7 +170,7 @@ async function downloadArticle(page, item) {
     const fileContent = `${content.title}\n\n${content.text}`;
     fs.writeFileSync(filePath, fileContent, 'utf-8');
     log(`✓ 文章已保存: ${filePath}`);
-    
+
     return path.relative(__dirname, filePath);
 }
 
@@ -246,18 +246,18 @@ async function downloadVideo(page, item) {
 
     // Candidates
     const candidates = [];
-    
+
     const client = await page.target().createCDPSession();
     await client.send('Network.enable');
-    
+
     const responseHandler = (event) => {
         const resp = event.response;
         if (!resp.mimeType) return;
-        
+
         if (resp.url.startsWith('http')) {
             const isVideo = resp.mimeType.includes('video/');
             const isAudio = resp.mimeType.includes('audio/');
-            
+
             if (isVideo || isAudio) {
                 candidates.push({
                     url: resp.url,
@@ -304,13 +304,13 @@ async function downloadVideo(page, item) {
 
     for (const cand of uniqueCandidates) {
         log(`  - [${cand.type}] ${cand.mime} Size:${cand.length} URL:${cand.url.substring(0, 50)}...`);
-        
+
         if (cand.type === 'video') {
             // Heuristic: Audio streams sometimes are labeled as video/mp4 but have "audio" in URL
             // Or just multiple video streams, pick largest if length known, otherwise update
             // For now, if we already have a videoUrl, only replace if this one looks "better" (e.g. larger)
             // But often length is 0 for chunks.
-            
+
             // Simple logic: If URL contains 'audio' and we have another option, skip it
             if (cand.url.includes('audio') && !cand.url.includes('video')) {
                  // Likely audio disguised as video mime
@@ -343,7 +343,7 @@ async function downloadVideo(page, item) {
         });
         if (videoUrl && !videoUrl.startsWith('http')) videoUrl = null;
     }
-    
+
     // Fallback: Scripts
     if (!videoUrl) {
         const scriptUrl = await page.evaluate(() => {
@@ -374,7 +374,7 @@ async function downloadVideo(page, item) {
     // 1. Download "Video"
     log(`下载主视频流: ${videoUrl.substring(0, 50)}...`);
     await downloadStream(videoUrl, tempVideo, MAX_VIDEO_SIZE_MB);
-    
+
     // Verify what we downloaded
     let videoCheck = await checkFileStreams(tempVideo);
     log(`主文件流检查: Video=${videoCheck.hasVideo}, Audio=${videoCheck.hasAudio}`);
@@ -402,7 +402,7 @@ async function downloadVideo(page, item) {
     if (downloadedVideoPath && !videoCheck.hasAudio && !audioUrl) {
         log("主视频没有声音，尝试从其他候选流中寻找音频...");
         const otherCandidates = uniqueCandidates.filter(c => c.url !== videoUrl);
-        
+
         for (const cand of otherCandidates) {
             log(`  检查候选流: ${cand.url.substring(0, 50)}...`);
             const tempCand = path.join(targetDir, `${item['编号']}_cand_${Date.now()}.mp4`);
@@ -411,7 +411,7 @@ async function downloadVideo(page, item) {
                 await downloadStream(cand.url, tempCand, MAX_VIDEO_SIZE_MB);
                 const candCheck = await checkFileStreams(tempCand);
                 log(`  候选流检查: Video=${candCheck.hasVideo}, Audio=${candCheck.hasAudio}`);
-                
+
                 if (candCheck.hasAudio) {
                     log("  -> 找到音频流！");
                     if (fs.existsSync(tempAudio)) fs.unlinkSync(tempAudio);
@@ -496,7 +496,7 @@ function extractAudio(videoPath, item) {
                 return reject(error);
             }
             log(`✓ [音频] 提取成功: ${audioPath}`);
-            
+
             if (!KEEP_ORIGINAL_VIDEO) {
                 fs.unlink(fullVideoPath, (err) => {
                     if (err) log(`警告: 删除原视频失败: ${err.message}`);
@@ -573,7 +573,7 @@ async function updateExcelAudioStatus(link, status) {
 
         while (retry <= RETRY_TIMES && !success) {
             if (retry > 0) log(`  正在重试 (${retry}/${RETRY_TIMES})...`);
-            
+
             try {
                 let localPath = '';
                 if (item['媒体类型'] === '文章') {
@@ -587,7 +587,7 @@ async function updateExcelAudioStatus(link, status) {
                     success = true; 
                     continue;
                 }
-                
+
                 await updateExcelStatus(item['链接'], 1, localPath);
                 success = true;
                 successCount++;

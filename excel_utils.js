@@ -70,7 +70,7 @@ async function ensureExcelFile(filePath) {
     } else {
         const sheet = workbook.addWorksheet('Favorites');
         setupHeaders(sheet);
-        
+
         // Freeze first row
         sheet.views = [
             { state: 'frozen', xSplit: 0, ySplit: 1 }
@@ -86,7 +86,7 @@ function setupHeaders(sheet) {
         const cell = headerRow.getCell(index + 1);
         cell.value = h;
         styleHeaderCell(cell);
-        
+
         // Set default width
         const column = sheet.getColumn(index + 1);
         if (h === '标题' || h === '链接' || h === '本地地址' || h === 'Notion链接') {
@@ -118,7 +118,7 @@ async function readExcelData(filePath) {
     const data = [];
     const headerRow = sheet.getRow(1);
     const headers = [];
-    
+
     // Map column index to header name
     headerRow.eachCell((cell, colNumber) => {
         headers[colNumber] = cell.value ? cell.value.toString().trim() : '';
@@ -131,7 +131,7 @@ async function readExcelData(filePath) {
         // Check if row is empty (ignore formatting only rows)
         let hasData = false;
         const rowData = {};
-        
+
         // We iterate based on known headers to ensure structure
         // But also check if row actually has values
         row.eachCell((cell) => {
@@ -143,12 +143,12 @@ async function readExcelData(filePath) {
                 if (!h) return;
                 let cell = row.getCell(colIndex);
                 let val = cell.value;
-                
+
                 // Handle Hyperlinks: cell.value might be object { text: '...', hyperlink: '...' }
                 if (val && typeof val === 'object' && val.text) {
                     val = val.text;
                 }
-                
+
                 // Handle Rich Text (rare but possible)
                 if (val && typeof val === 'object' && val.richText) {
                     val = val.richText.map(rt => rt.text).join('');
@@ -191,7 +191,7 @@ async function appendExcelData(filePath, newData) {
 
     newData.forEach(item => {
         const row = sheet.getRow(currentRow);
-        
+
         // Fill data based on headers
         Object.keys(item).forEach(key => {
             if (headerMap[key]) {
@@ -199,11 +199,11 @@ async function appendExcelData(filePath, newData) {
                 row.getCell(colIndex).value = item[key];
             }
         });
-        
+
         // Optional: inherit style from previous row if exists
         // (Not strictly required by user, but nice to have. User said "New rows can have no special format or inherit")
         // We leave it clean to avoid complexity with borders etc.
-        
+
         row.commit(); // Not strictly necessary but good practice
         currentRow++;
     });
@@ -232,7 +232,7 @@ async function updateExcelRow(filePath, uniqueKeyName, uniqueValue, updates) {
     }
 
     const sheet = workbook.getWorksheet(1);
-    
+
     // Find Column Indices
     const headerMap = {};
     const headerRow = sheet.getRow(1);
@@ -248,13 +248,13 @@ async function updateExcelRow(filePath, uniqueKeyName, uniqueValue, updates) {
 
     // Find the row
     let targetRow = null;
-    
+
     // Iterate rows. Note: huge files might be slow, but requirement is robustness.
     // Optimization: start from row 2
     sheet.eachRow((row, rowNumber) => {
         if (rowNumber === 1) return;
         const cellValue = row.getCell(keyColIndex).value;
-        
+
         // Handle potential hyperlink objects in key column (unlikely for Link column if stored as text, but possible)
         let val = cellValue;
         if (val && typeof val === 'object' && val.text) val = val.text;

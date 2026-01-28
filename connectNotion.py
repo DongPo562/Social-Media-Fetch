@@ -26,7 +26,6 @@ PAGE_ID = os.environ.get("PAGE_ID")  # ← 这就是您的页面ID
 if not NOTION_TOKEN or not PAGE_ID:
     print("❌ 错误: 未找到 Notion 配置信息。请确保 .env 文件中包含 NOTION_TOKEN 和 PAGE_ID")
     exit(1)
-                      
 
 # API 请求头
 headers = {
@@ -40,10 +39,10 @@ def test_read_page():
     print("=" * 50)
     print("测试 1: 读取页面信息")
     print("=" * 50)
-    
+
     url = f"https://api.notion.com/v1/pages/{PAGE_ID}"
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         print("✅ 成功读取页面!")
         data = response.json()
@@ -61,10 +60,10 @@ def test_read_blocks():
     print("\n" + "=" * 50)
     print("测试 2: 读取页面内容块")
     print("=" * 50)
-    
+
     url = f"https://api.notion.com/v1/blocks/{PAGE_ID}/children"
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         print("✅ 成功读取页面内容!")
         blocks = response.json().get('results', [])
@@ -82,9 +81,9 @@ def test_append_block():
     print("\n" + "=" * 50)
     print("测试 3: 添加测试内容（编辑权限测试）")
     print("=" * 50)
-    
+
     url = f"https://api.notion.com/v1/blocks/{PAGE_ID}/children"
-    
+
     # 创建一个测试块
     test_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     data = {
@@ -105,9 +104,9 @@ def test_append_block():
             }
         ]
     }
-    
+
     response = requests.patch(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         print("✅ 成功添加测试内容!")
         print(f"添加时间: {test_time}")
@@ -122,21 +121,21 @@ def main():
     print("\n🚀 开始测试 Notion 页面权限")
     print(f"📄 页面: social media info")
     print(f"🔑 页面ID: {PAGE_ID}\n")
-    
+
     results = {
         "读取页面": test_read_page(),
         "读取内容": test_read_blocks(),
         "编辑页面": test_append_block()
     }
-    
+
     print("\n" + "=" * 50)
     print("📊 测试结果汇总")
     print("=" * 50)
-    
+
     for test_name, result in results.items():
         status = "✅ 通过" if result else "❌ 失败"
         print(f"{test_name}: {status}")
-    
+
     all_passed = all(results.values())
     print("\n" + "=" * 50)
     if all_passed:

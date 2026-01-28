@@ -89,7 +89,7 @@ async function getExcelData() {
 
 async function saveExcelData(newData) {
     let existingData = [];
-    
+
     try {
         existingData = await ExcelUtils.readExcelData(EXCEL_PATH);
 
@@ -126,10 +126,10 @@ async function saveExcelData(newData) {
 
 function cleanTitle(t) {
     if (!t) return '';
-    
+
     // Remove hashtags (content categories)
     t = t.replace(/#[\w\u4e00-\u9fa5]+/g, '').trim();
-    
+
     t = t.trim();
     if (t.length > 5) {
         const half = Math.floor(t.length / 2);
@@ -209,7 +209,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
 
         log("等待个人中心入口加载...");
         const userLinkSelector = 'a[href*="/c/user/"]';
-        
+
         try {
             await page.waitForSelector(userLinkSelector, { timeout: 15000 });
         } catch (e) {
@@ -219,12 +219,12 @@ async function autoScroll(page, distanceVal, intervalVal) {
 
         const userLinkEl = await page.$(userLinkSelector);
         if (!userLinkEl) throw new Error("无法找到个人中心链接");
-        
+
         const userHref = await page.evaluate(el => el.href, userLinkEl);
         log(`进入个人中心: ${userHref}`);
-        
+
         await page.goto(userHref, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
-        
+
         // Debug: Print current URL and Title
         const currentUrl = page.url();
         const currentTitle = await page.title();
@@ -255,7 +255,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                 "//div[contains(@class, 'tab')]//div[contains(text(), '收藏')]",
                 "//ul//li//span[contains(text(), '收藏')]"
             ];
-            
+
             for (const xpath of xpaths) {
                 const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
                 const node = result.singleNodeValue;
@@ -264,7 +264,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                     return true;
                 }
             }
-            
+
             // Fallback: search all text in common containers
             const elements = document.querySelectorAll('div[class*="tab"], li, span, a[class*="tab"]');
             for (let el of elements) {
@@ -285,7 +285,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
              // Remove query params
              targetUrl = targetUrl.split('?')[0];
              if (!targetUrl.endsWith('/')) targetUrl += '/';
-             
+
              // If we are at /c/user/token/..., this might not work directly if it redirects.
              // But let's try appending 'favorite/'
              if (!targetUrl.includes('favorite')) {
@@ -323,21 +323,21 @@ async function autoScroll(page, distanceVal, intervalVal) {
         await new Promise(r => setTimeout(r, 1000));
 
         log(`正在提取前 ${FETCH_COUNT} 条内容...`);
-        
+
         const items = await page.evaluate((count) => {
             const results = [];
-            
+
             // Try broad selectors for items
             // Looking for blocks that might be cards
             let potentialItems = Array.from(document.querySelectorAll('.feed-card-wrapper, .article-card, .wtt-feed-card, .card-container, div[class*="card"], div[class*="item"], div.profile-article-card-wrapper, div.profile-normal-video-card-wrapper, div.wtt-content, div[class*="wtt-feed"], div[class*="weitoutiao"]'));
-            
+
             let validItems = potentialItems.filter(el => {
                 const link = el.querySelector('a');
                 const text = el.innerText;
                 // Basic validation: needs a link and some text
                 return link && text && text.trim().length > 10;
             });
-            
+
             // Fallback: direct link search if structure is not found
             if (validItems.length < 2) {
                  const links = Array.from(document.querySelectorAll('a'));
@@ -352,7 +352,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                             !text.includes('评论') &&
                             !/^\d+$/.test(text); // Filter out pure numbers
                  });
-                 
+
                  const uniqueLinks = new Map();
                  contentLinks.forEach(a => {
                      // Normalize link to remove hash for deduplication
@@ -361,7 +361,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                          uniqueLinks.set(urlNoHash, a);
                      }
                  });
-                 
+
                  // Promote links to their containers for better context (title/category extraction)
                  validItems = Array.from(uniqueLinks.values()).map(a => {
                      let container = a;
@@ -379,7 +379,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
 
             for (let i = 0; i < validItems.length && results.length < count; i++) {
                 const el = validItems[i];
-                
+
                 // Link
                 let link = '';
                 const linkEl = el.querySelector('a[href*="/group/"], a[href*="/item/"], a[href*="/video/"], a[href*="toutiao.com/a"], a[href*="/w/"]');
@@ -398,7 +398,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
 
                 // Type Detection
                 let type = "未知";
-                
+
                 // 优先使用 URL 路径特征进行判断
                 if (link) {
                     if (link.includes("/video/")) {
@@ -441,7 +441,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                     });
                     if (!title) title = el.innerText.substring(0, 50);
                 }
-                
+
                 if (!link || !title) continue;
                 if (link.includes('#comment')) continue; // Double check
 
@@ -456,7 +456,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                 if (match) {
                     category = match[0];
                 }
-                
+
                 if (!results.some(r => r.link === link)) {
                     results.push({ title, link, category, type });
                 }
@@ -469,7 +469,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
             if (item.title.length > 200) item.title = item.title.substring(0, 197) + '...';
             if (item.category.length > 100) item.category = item.category.substring(0, 97) + '...';
         });
-        
+
         // Duplicate Check and Save
         const existingData = await getExcelData();
         const existingLinks = new Set(existingData.map(r => r['链接']));
@@ -521,7 +521,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                 // Since download_content.js is likely a standalone script, spawning is safer to isolate contexts.
                 const { spawn } = require('child_process');
                 const downloadProcess = spawn('node', ['download_content.js'], { stdio: 'inherit', cwd: __dirname });
-                
+
                 downloadProcess.on('close', (code) => {
                     log(`下载模块运行结束，退出码: ${code}`);
 
@@ -532,7 +532,7 @@ async function autoScroll(page, distanceVal, intervalVal) {
                              try {
                                 const { spawn } = require('child_process');
                                 const syncProcess = spawn('node', ['sync_to_notion.js'], { stdio: 'inherit', cwd: __dirname });
-                                
+
                                 syncProcess.on('close', (syncCode) => {
                                     log(`Notion 同步模块运行结束，退出码: ${syncCode}`);
                                 });

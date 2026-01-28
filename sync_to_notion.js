@@ -67,19 +67,19 @@ async function updateExcelNotionStatus(link, status, notionUrl = '') {
 function convertToMarkdown(txtPath, title, link, date, category) {
     try {
         const content = fs.readFileSync(txtPath, 'utf-8');
-        
+
         // Basic cleanup
         let lines = content.split('\n');
-        
+
         // Remove title from content if it's repeated at start (often the case)
         if (lines.length > 0 && lines[0].trim() === title.trim()) {
             lines.shift();
         }
-        
+
         // Filter empty lines and normalize
         let cleanLines = [];
         let lastWasEmpty = false;
-        
+
         for (let line of lines) {
             let trimmed = line.trim();
             if (!trimmed) {
@@ -99,9 +99,9 @@ function convertToMarkdown(txtPath, title, link, date, category) {
                 lastWasEmpty = false;
             }
         }
-        
+
         const body = cleanLines.join('\n');
-        
+
         // Front Matter for local MD file
         const frontMatter = `---
 title: ${title}
@@ -112,7 +112,7 @@ category: ${category}
 
 `;
         return frontMatter + body;
-        
+
     } catch (e) {
         throw new Error(`Markdown转换失败: ${e.message}`);
     }
@@ -137,13 +137,13 @@ async function syncToNotion(item) {
 
     // Convert
     const mdContentFull = convertToMarkdown(txtPath, title, link, date, category);
-    
+
     // Save MD file
     if (!fs.existsSync(MARKDOWN_FOLDER)) {
         fs.mkdirSync(MARKDOWN_FOLDER, { recursive: true });
     }
     // Handle filename conflicts
-    let mdFilename = `${id}_${title.replace(/[\\/:*?"<>|]/g, '_')}.md`;
+    let mdFilename = `${id}_${title.replace(/[\/:*?"<>|]/g, '_')}.md`;
     if (mdFilename.length > 100) mdFilename = `${id}_article.md`;
     const mdPath = path.join(MARKDOWN_FOLDER, mdFilename);
     fs.writeFileSync(mdPath, mdContentFull, 'utf-8');
@@ -151,7 +151,7 @@ async function syncToNotion(item) {
     // Prepare JSON for Python
     // We strip FrontMatter for Notion upload because we pass metadata separately
     const mdBody = mdContentFull.replace(/^---\n[\s\S]*?\n---\n\n/, '');
-    
+
     const payload = {
         database_id: DATABASE_ID,  // Changed from parent_page_id
         title: title,
@@ -160,13 +160,13 @@ async function syncToNotion(item) {
         publish_date: date,
         category: category
     };
-    
+
     const tempJsonPath = path.join(__dirname, `temp_sync_${id}.json`);
     fs.writeFileSync(tempJsonPath, JSON.stringify(payload), 'utf-8');
 
     return new Promise((resolve, reject) => {
         const pythonProcess = spawn('python', ['notion_uploader.py', '--input', tempJsonPath]);
-        
+
         let stdoutData = '';
         let stderrData = '';
 
@@ -231,10 +231,10 @@ async function syncToNotion(item) {
     const allData = await getExcelData();
     const tasks = allData.filter(item => {
         if (item['媒体类型'] !== '文章') return false;
-        
+
         // Default undefined status to 0
         const status = item['Notion状态'] !== undefined ? parseInt(item['Notion状态']) : 0;
-        
+
         if (status === 0) return true;
         if (RETRY_FAILED && status === 2) return true;
         return false;
