@@ -67,6 +67,7 @@ const path = require('path');
   
   // 提取并列出收藏列表中最近5条内容的标题
   console.log('正在提取收藏列表中的标题...');
+
   try {
     // 提取收藏列表中的标题，使用更灵活的选择器
     const titles = await page.evaluate(() => {

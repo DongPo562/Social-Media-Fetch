@@ -129,12 +129,22 @@ def text_to_blocks(markdown_text):
 
     return blocks
 
-def create_page(parent_id, title, blocks, metadata=None):
+def create_database_page(database_id, title, blocks, metadata=None):
+    """
+    Create a new page in a Notion database.
+    
+    Args:
+        database_id: The ID of the target database
+        title: The title of the page (maps to '标题' property)
+        blocks: List of Notion block objects for page content
+        metadata: Optional dict with 'link', 'date', 'category' for callout
+    """
     url = "https://api.notion.com/v1/pages"
     
-    # Construct properties (Title)
+    # Construct properties matching the database schema
+    # Database has: 标题 (title), 状态 (select), 阅读日期 (date)
     properties = {
-        "title": {
+        "标题": {
             "title": [
                 {
                     "text": {
@@ -142,18 +152,31 @@ def create_page(parent_id, title, blocks, metadata=None):
                     }
                 }
             ]
+        },
+        "状态": {
+            "select": {
+                "name": "未读"
+            }
         }
     }
+    
+    # Optionally set 阅读日期 if provided
+    if metadata and metadata.get('date'):
+        properties["阅读日期"] = {
+            "date": {
+                "start": metadata['date']
+            }
+        }
 
     # Add metadata block at the top if provided
     children = []
     if metadata:
         meta_text = []
-        if 'link' in metadata:
+        if metadata.get('link'):
             meta_text.append(f"🔗 原文链接: {metadata['link']}")
-        if 'date' in metadata:
+        if metadata.get('date'):
             meta_text.append(f"📅 抓取日期: {metadata['date']}")
-        if 'category' in metadata:
+        if metadata.get('category'):
             meta_text.append(f"🏷️ 分类: {metadata['category']}")
             
         if meta_text:
@@ -171,15 +194,12 @@ def create_page(parent_id, title, blocks, metadata=None):
                  "divider": {}
             })
 
-    # Add content blocks (Batching: Notion allows max 100 children in create, and we might need to append more)
-    # Actually, for create page, we can pass children.
-    # Let's handle the first 90 blocks in creation, and append the rest.
-    
+    # Add content blocks (Batching: Notion allows max 100 children in create)
     initial_children = children + blocks[:90]
     remaining_blocks = blocks[90:]
     
     payload = {
-        "parent": {"page_id": parent_id},
+        "parent": {"database_id": database_id},
         "properties": properties,
         "children": initial_children,
         "icon": {"emoji": "📄"}
@@ -220,7 +240,7 @@ def append_children(block_id, blocks):
             print(f"Warning: Failed to append batch {i}: {e}", file=sys.stderr)
 
 def main():
-    parser = argparse.ArgumentParser(description='Upload content to Notion')
+    parser = argparse.ArgumentParser(description='Upload content to Notion Database')
     parser.add_argument('--input', required=True, help='Path to JSON input file')
     args = parser.parse_args()
     
@@ -232,7 +252,7 @@ def main():
         with open(args.input, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
-        parent_id = data.get('parent_page_id')
+        database_id = data.get('database_id')
         title = data.get('title')
         content = data.get('markdown_content', '')
         metadata = {
@@ -241,12 +261,12 @@ def main():
             'category': data.get('category')
         }
         
-        if not parent_id or not title:
-            print(json.dumps({"success": False, "error": "Missing parent_page_id or title"}))
+        if not database_id or not title:
+            print(json.dumps({"success": False, "error": "Missing database_id or title"}))
             sys.exit(1)
             
         blocks = text_to_blocks(content)
-        result = create_page(parent_id, title, blocks, metadata)
+        result = create_database_page(database_id, title, blocks, metadata)
         print(json.dumps(result))
         
     except Exception as e:

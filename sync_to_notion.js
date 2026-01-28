@@ -18,7 +18,7 @@ const TOUTIAO_CONFIG = config.TouTiao || {};
 const ADVANCED_CONFIG = config.Advanced || {};
 
 const ENABLE_NOTION_SYNC = NOTION_CONFIG.enable_notion_sync === true || NOTION_CONFIG.enable_notion_sync === 'true';
-const PARENT_PAGE_ID = NOTION_CONFIG.parent_page_id;
+const DATABASE_ID = NOTION_CONFIG.database_id;  // Changed from parent_page_id
 const RETRY_FAILED = NOTION_CONFIG.retry_failed === true || NOTION_CONFIG.retry_failed === 'true';
 
 const EXCEL_PATH = path.resolve(__dirname, TOUTIAO_CONFIG.excel_path || 'favorite.xlsx');
@@ -102,10 +102,7 @@ function convertToMarkdown(txtPath, title, link, date, category) {
         
         const body = cleanLines.join('\n');
         
-        // Front Matter is for file storage, but we pass raw body to Python script.
-        // The Python script adds metadata as a Callout block, so we don't strictly need Front Matter in the body passed to Notion.
-        // But for the local MD file, we should add it.
-        
+        // Front Matter for local MD file
         const frontMatter = `---
 title: ${title}
 link: ${link}
@@ -156,7 +153,7 @@ async function syncToNotion(item) {
     const mdBody = mdContentFull.replace(/^---\n[\s\S]*?\n---\n\n/, '');
     
     const payload = {
-        parent_page_id: PARENT_PAGE_ID,
+        database_id: DATABASE_ID,  // Changed from parent_page_id
         title: title,
         markdown_content: mdBody,
         original_link: link,
@@ -222,13 +219,13 @@ async function syncToNotion(item) {
         return;
     }
 
-    if (!PARENT_PAGE_ID) {
-        log("错误: 未配置 Notion parent_page_id");
+    if (!DATABASE_ID) {
+        log("错误: 未配置 Notion database_id");
         return;
     }
 
     log("=========================================");
-    log("开始 Notion 同步流程");
+    log("开始 Notion 同步流程 (数据库模式)");
     log("=========================================");
 
     const allData = await getExcelData();
